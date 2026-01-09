@@ -8,7 +8,10 @@
 #define PULL_LOW(port, pin) ((port) &= ~_BV(pin))
 #define PULL_HIGH(port, pin) ((port) |= _BV(pin))
 
-void SPI_init() {
+/*
+ * screen stuff
+ */
+static void SPI_init() {
 
 	// initialize (hardware-specific SPI) pins as output
 	SET_PIN_AS_OUT(DDRB, 2); // MUST BE OUTPUT (it's called the CS pin but that's for if this arduino is a... puppet, but we're using it as master)
@@ -20,7 +23,7 @@ void SPI_init() {
     SPCR = (1 << SPE) | (1 << MSTR);
 }
 
-uint8_t SPI_transfer(uint8_t data) {
+static uint8_t SPI_transfer(uint8_t data) {
 
     // Start transmission
     SPDR = data;
@@ -32,7 +35,7 @@ uint8_t SPI_transfer(uint8_t data) {
     return SPDR; // Even if you only want to send data, reading the register clears the flag
 }
 
-void ST7735S_send_command(uint8_t command) {
+static void ST7735S_send_command(uint8_t command) {
 
 	PULL_LOW(PORTB, 0); // DC low for commands
 	PULL_LOW(PORTD, 4);
@@ -40,7 +43,7 @@ void ST7735S_send_command(uint8_t command) {
 	PULL_HIGH(PORTD, 4);
 }
 
-void ST7735S_send_data(uint8_t data) {
+static void ST7735S_send_data(uint8_t data) {
 
 	PULL_HIGH(PORTB, 0); // DC high for data
 	PULL_LOW(PORTD, 4);
@@ -48,7 +51,7 @@ void ST7735S_send_data(uint8_t data) {
 	PULL_HIGH(PORTD, 4);
 }
 
-void ST7735S_init() {
+static void ST7735S_init() {
 
 	/*
 	 * initialize relevant pins as output
@@ -76,10 +79,47 @@ void ST7735S_init() {
 	ST7735S_send_command(0x29); // Display On
 }
 
+/*
+ * joystick stuff
+ */
+void ADC_init() {
+
+    // initialize Analog-to-Digital Converter (ADC)
+
+    // REFS0   = 1 : Select AVcc as reference voltage (usually 5V or 3.3V, depending on board)
+    // MUX0..3 = 0 : Select ADC0 pin (A0)
+    ADMUX = _BV(REFS0);
+
+    // ADEN     = 1     : enable the ADC
+    // ADPS0..2 = 0b111 : set ADC prescaler to 128
+    // this makes the ADC clock 16MHz/128 = 125kHz, which is within the recommended 50kHz-200kHz range for full 10-bit resolution
+    ADCSRA = _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);
+}
+
+// function to read a value from a single ADC channel and return it as a 10-bit number (10-bit resolution = 1024 steps)
+uint16_t ADC_read(uint8_t channel) {
+
+    // MUX0..3 = 4-bit number representing channel
+    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F); 
+
+    // start the conversion
+    ADCSRA |= _BV(ADSC); 
+
+    // wait for the conversion to complete
+    while (ADCSRA & _BV(ADSC)); 
+
+    // return the 10-bit result (ADCL and ADCH registers are combined)
+    return ADC;
+}
+
+/*
+ * header functions
+ */
 void init_hardware() {
 
 	SPI_init();
 	ST7735S_init();
+	ADC_init();
 }
 
 void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
@@ -107,3 +147,36 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
 		ST7735S_send_data(c & 0xFF);
 	}
 }
+
+
+
+
+
+
+// float vrx = (float) ADC_read(0) / 1024.0;
+
+
+
+
+
+
+
+
+/*
+ * onboard LED code which im saving in case I need it
+ */
+// // disable SPI (necessary for pin 13 to correspond to the onboard LED)
+// SPCR = 0;
+
+// // pin 5 of PORTB (pin 13) must be output btw
+// // loop
+// while (1) {
+
+// 	// set pin 5 high to turn led on
+// 	PULL_HIGH(PORTB, 5);
+// 	_delay_ms(100);
+
+// 	// set pin 5 low to turn led off
+// 	PULL_LOW(PORTB, 5);
+// 	_delay_ms(100);
+// }
