@@ -4,7 +4,7 @@ int main() {
 
 	init_hardware();
 
-	fill_rect(40, 40, 16, 32, 0x0884);
+	fill_rect(0, 0, 128, 160, 0x5884);
 
 	// // disable SPI (necessary for pin 13 to correspond to the onboard LED)
 	// SPCR = 0;
