@@ -91,18 +91,18 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
 	ST7735S_send_data(0x00); 			// start_x
 	ST7735S_send_data(x & 0xFF);
 	ST7735S_send_data(0x00); 			// end_x
-	ST7735S_send_data((x + w - 1) & 0xFF);
+	ST7735S_send_data((x + w) & 0xFF);
 
 	ST7735S_send_command(0x2B); 		// Row Address Set
 	ST7735S_send_data(0x00); 			// start_y
 	ST7735S_send_data(y & 0xFF);
 	ST7735S_send_data(0x00); 			// end_y
-	ST7735S_send_data((y + h - 1) & 0xFF);
+	ST7735S_send_data((y + h) & 0xFF);
 
 	ST7735S_send_command(0x2C); // Memory Write
 
 	// pixel color data
-	for (int i = 0; i < w * h; i++) {
+	for (int i = 0; i < (w + 1) * (h + 1); i++) {
 		ST7735S_send_data(c >> 8);
 		ST7735S_send_data(c & 0xFF);
 	}
