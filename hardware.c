@@ -82,7 +82,7 @@ static void ST7735S_init() {
 /*
  * joystick stuff
  */
-void ADC_init() {
+static void ADC_init() {
 
     // initialize Analog-to-Digital Converter (ADC)
 
@@ -97,7 +97,7 @@ void ADC_init() {
 }
 
 // function to read a value from a single ADC channel and return it as a 10-bit number (10-bit resolution = 1024 steps)
-uint16_t ADC_read(uint8_t channel) {
+static uint16_t ADC_read(uint8_t channel) {
 
     // MUX0..3 = 4-bit number representing channel
     ADMUX = (ADMUX & 0xF0) | (channel & 0x0F); 
@@ -148,13 +148,14 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
 	}
 }
 
+uint16_t get_x1024() {
 
+	return ADC_read(0);
+}
 
-
-
-
-// float vrx = (float) ADC_read(0) / 1024.0;
-
+void sleep() {
+	_delay_ms(100);
+}
 
 
 
