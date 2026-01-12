@@ -12,7 +12,7 @@ VRX => A0
 VRY => A1
 ```
 
-[Screen](https://www.amazon.com/128x160-Display-ST7735S-Replace-Arduino/dp/B0F1C8X7D8?crid=1UN5AV648102T)
+[Screen](https://www.amazon.com/128x160-Display-ST7735S-Replace-Arduino/dp/B0F1C8X7D8?crid=1UN5AV648102T) ([datasheet](https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf))
 ```
 GND => GND  (Arduino)
 VDD => 3.3V ...

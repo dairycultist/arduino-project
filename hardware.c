@@ -78,6 +78,11 @@ static void ST7735S_init() {
 	SPI_transfer(0x03); // 12-bit color (RGB444)
 
 	ST7735S_start_command();
+	SPI_transfer(0x36); // Memory data access control (MADCTL)
+	ST7735S_start_data();
+	SPI_transfer(_BV(5) | _BV(6)); // X-Y Exchange + X-Mirror
+
+	ST7735S_start_command();
 	SPI_transfer(0x29); // Display On
 }
 
