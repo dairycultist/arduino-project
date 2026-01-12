@@ -165,6 +165,39 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_
 	}
 }
 
+void draw_sprite(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *bytes) {
+
+	x++;
+	y++;
+
+	ST7735S_start_command();
+	SPI_transfer(0x2A); 		// Column Address Set
+	ST7735S_start_data();
+	SPI_transfer(0x00); 		// start_x
+	SPI_transfer(x & 0xFF);
+	SPI_transfer(0x00); 		// end_x
+	SPI_transfer((x + w - 1) & 0xFF);
+
+	ST7735S_start_command();
+	SPI_transfer(0x2B); 		// Row Address Set
+	ST7735S_start_data();
+	SPI_transfer(0x00); 		// start_y
+	SPI_transfer(y & 0xFF);
+	SPI_transfer(0x00); 		// end_y
+	SPI_transfer((y + h - 1) & 0xFF);
+
+	ST7735S_start_command();
+	SPI_transfer(0x2C); 		// Memory Write
+
+	// pixel color data
+	ST7735S_start_data();
+
+	int byte_count = w * h * 3 / 2;
+
+	for (int i = 0; i < byte_count; i++)
+		SPI_transfer(bytes[i]);
+}
+
 inline uint16_t get_x1024() {
 	return ADC_read(0);
 }
