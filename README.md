@@ -8,8 +8,8 @@ Code written specifically for **Arduino Uno REV3**.
 ```
 GND => GND (Arduino)
 +5V => 5V  ...
-VRX => A0  ...
-VRY => A1  ...
+VRX => A0
+VRY => A1
 ```
 
 [Screen](https://www.amazon.com/128x160-Display-ST7735S-Replace-Arduino/dp/B0F1C8X7D8?crid=1UN5AV648102T)

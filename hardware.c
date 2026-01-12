@@ -151,10 +151,17 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_
 	// pixel color data
 	ST7735S_start_data();
 
-	for (int i = 0; i < (w + 1) * (h + 1) / 2; i++) {
+	int pixel_count = (w + 1) * (h + 1);
+
+	for (int i = 0; i < pixel_count / 2; i++) {
 		SPI_transfer(r << 4 | g);
 		SPI_transfer(b << 4 | r);
 		SPI_transfer(g << 4 | b);
+	}
+
+	if (pixel_count % 2 == 1) {
+		SPI_transfer(r << 4 | g);
+		SPI_transfer(b << 4);
 	}
 }
 
