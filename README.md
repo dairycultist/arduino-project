@@ -6,16 +6,18 @@ Code written specifically for **Arduino Uno REV3**.
 
 [Dual-axis joystick](https://www.amazon.com/Joystick-Console-Dual-Axis-Compatible-Raspberry/dp/B0D83FD3M8)
 ```
-GND => GND (Arduino)
-+5V => 5V  ...
+Joy    Arduino
+GND => GND
++5V => 5V
 VRX => A0
 VRY => A1
 ```
 
 [Screen](https://www.amazon.com/128x160-Display-ST7735S-Replace-Arduino/dp/B0F1C8X7D8?crid=1UN5AV648102T) ([datasheet](https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf))
 ```
-GND => GND  (Arduino)
-VDD => 3.3V ...
+Screen Arduino
+GND => GND
+VDD => 3.3V
 SCL => 13
 SDA => 11
 RST => 7

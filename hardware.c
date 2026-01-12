@@ -131,8 +131,8 @@ void init_hardware() {
 
 void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_t g, uint8_t b) {
 
-	x++;
-	y++;
+	x++; // quirky stuff with the screen
+	y += 2;
 
 	ST7735S_start_command();
 	SPI_transfer(0x2A); 		// Column Address Set
@@ -140,7 +140,7 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_
 	SPI_transfer(0x00); 		// start_x
 	SPI_transfer(x & 0xFF);
 	SPI_transfer(0x00); 		// end_x
-	SPI_transfer((x + w) & 0xFF);
+	SPI_transfer((x + w - 1) & 0xFF);
 
 	ST7735S_start_command();
 	SPI_transfer(0x2B); 		// Row Address Set
@@ -148,7 +148,7 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_
 	SPI_transfer(0x00); 		// start_y
 	SPI_transfer(y & 0xFF);
 	SPI_transfer(0x00); 		// end_y
-	SPI_transfer((y + h) & 0xFF);
+	SPI_transfer((y + h - 1) & 0xFF);
 
 	ST7735S_start_command();
 	SPI_transfer(0x2C); 		// Memory Write
@@ -156,7 +156,7 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_
 	// pixel color data
 	ST7735S_start_data();
 
-	int pixel_count = (w + 1) * (h + 1);
+	int pixel_count = w * h;
 
 	for (int i = 0; i < pixel_count / 2; i++) {
 		SPI_transfer(r << 4 | g);
@@ -173,7 +173,7 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_
 void draw_sprite(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *bytes) {
 
 	x++;
-	y++;
+	y += 2;
 
 	ST7735S_start_command();
 	SPI_transfer(0x2A); 		// Column Address Set

@@ -16,8 +16,20 @@ int main() {
 
 	while (1) {
 
-		new_x = get_x1024() >> 4;
-		new_y = get_y1024() >> 4;
+		new_x = prev_x + (get_x1024() >> 7);
+		new_y = prev_y + (get_y1024() >> 7);
+
+		if (new_x < 4) {
+			new_x = 0;
+		} else {
+			new_x -= 4;
+		}
+
+		if (new_y < 4) {
+			new_y = 0;
+		} else {
+			new_y -= 4;
+		}
 
 		if (new_x != prev_x || new_y != prev_y) {
 
