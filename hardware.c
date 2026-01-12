@@ -21,9 +21,6 @@ static void SPI_init() {
 	// initialize SPI (with clock rate = fosc/4)
     // SPE = 1 (Enable SPI), MSTR = 1 (Master mode)
     SPCR = (1 << SPE) | (1 << MSTR);
-
-	// SPCR |= (1 << SPR0); // SPR1=0, SPR0=1
-  	// SPSR |= (1 << SPI2X); // Set SPI2X bit for doubling speed
 }
 
 static inline uint8_t SPI_transfer(uint8_t data) {

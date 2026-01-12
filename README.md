@@ -1,5 +1,29 @@
 Code written specifically for **Arduino Uno REV3**.
 
+## Hardware Configuration
+
+[Arduino Uno REV3](https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6)
+
+[Dual-axis joystick](https://www.amazon.com/Joystick-Console-Dual-Axis-Compatible-Raspberry/dp/B0D83FD3M8)
+```
+GND => GND (Arduino)
++5V => 5V  ...
+VRX => A0  ...
+VRY => A1  ...
+```
+
+[Screen](https://www.amazon.com/128x160-Display-ST7735S-Replace-Arduino/dp/B0F1C8X7D8?crid=1UN5AV648102T)
+```
+GND => GND  (Arduino)
+VDD => 3.3V ...
+SCL => 13
+SDA => 11
+RST => 7
+DC  => 8
+CS  => 4
+BLK => 3.3V
+```
+
 ## Compilation and Uploading
 
 ```
@@ -31,13 +55,12 @@ one game-console
 
 ### Hardware Specification
 
-- [Arduino Uno REV3](https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6)
+- Arduino
   - Machine-code compiles from C
   - No cartridges (for now…?) — all games are loaded into onboard memory (filesystem) (SMB1 was 40KB, this only has 32KB, erm)
   - Apparently arduino isn’t good for projects that require dynamically loading and executing code, which isn’t necessary if we aren’t reading programs off SD cards but hmmmm arduino seems a bit toooo limited…
-- [dual-axis joystick](https://www.amazon.com/Joystick-Console-Dual-Axis-Compatible-Raspberry/dp/B0D83FD3M8)
 - 4 tactile face buttons
-- [screen](https://www.amazon.com/128x160-Display-ST7735S-Replace-Arduino/dp/B0F1C8X7D8?crid=1UN5AV648102T)
+- screen
   - DS is 3-inch diagonal (256×192px)
   - Nintendo Switch Lite is 5.5-inch diagonal (1280×720px) (hella overkill)
   - Refresh rate is kinda slow but this project is limited anyways sooo
