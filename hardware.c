@@ -21,9 +21,12 @@ static void SPI_init() {
 	// initialize SPI (with clock rate = fosc/4)
     // SPE = 1 (Enable SPI), MSTR = 1 (Master mode)
     SPCR = (1 << SPE) | (1 << MSTR);
+
+	// SPCR |= (1 << SPR0); // SPR1=0, SPR0=1
+  	// SPSR |= (1 << SPI2X); // Set SPI2X bit for doubling speed
 }
 
-static uint8_t SPI_transfer(uint8_t data) {
+static inline uint8_t SPI_transfer(uint8_t data) {
 
     // Start transmission
     SPDR = data;
@@ -32,23 +35,17 @@ static uint8_t SPI_transfer(uint8_t data) {
     while (!(SPSR & (1 << SPIF)));
     
     // Return received data
-    return SPDR; // Even if you only want to send data, reading the register clears the flag
+    return SPDR; // Even if you only want to *send* data, reading the register clears the flag
 }
 
-static void ST7735S_send_command(uint8_t command) {
+static inline void ST7735S_start_command() {
 
 	PULL_LOW(PORTB, 0); // DC low for commands
-	PULL_LOW(PORTD, 4);
-	SPI_transfer(command);
-	PULL_HIGH(PORTD, 4);
 }
 
-static void ST7735S_send_data(uint8_t data) {
+static inline void ST7735S_start_data() {
 
 	PULL_HIGH(PORTB, 0); // DC high for data
-	PULL_LOW(PORTD, 4);
-	SPI_transfer(data);
-	PULL_HIGH(PORTD, 4);
 }
 
 static void ST7735S_init() {
@@ -61,22 +58,30 @@ static void ST7735S_init() {
 	SET_PIN_AS_OUT(DDRD, 4); // CS
 
 	/*
+	 * select chip (pulling CS high deselects it)
+	 */
+	PULL_LOW(PORTD, 4);
+
+	/*
 	 * power-on sequence
 	 */
 	PULL_LOW(PORTD, 7); // hardware reset
 	_delay_ms(100);
 	PULL_HIGH(PORTD, 7);
 
-	ST7735S_send_command(0x01); // Software Reset
+	ST7735S_start_command();
+	SPI_transfer(0x01); // Software Reset
 	_delay_ms(120);
 
-	ST7735S_send_command(0x11); // Sleep Out (turns screen on)
+	SPI_transfer(0x11); // Sleep Out (turns screen on)
 	_delay_ms(120);
 
-	ST7735S_send_command(0x3A); // Color Mode
-	ST7735S_send_data(0x05); // 16-bit color (RGB565)
+	SPI_transfer(0x3A); // Color Mode
+	ST7735S_start_data();
+	SPI_transfer(0x03); // 12-bit color (RGB444)
 
-	ST7735S_send_command(0x29); // Display On
+	ST7735S_start_command();
+	SPI_transfer(0x29); // Display On
 }
 
 /*
@@ -122,29 +127,37 @@ void init_hardware() {
 	ADC_init();
 }
 
-void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
+void fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t r, uint8_t g, uint8_t b) {
 
 	x++;
 	y++;
 
-	ST7735S_send_command(0x2A); 		// Column Address Set
-	ST7735S_send_data(0x00); 			// start_x
-	ST7735S_send_data(x & 0xFF);
-	ST7735S_send_data(0x00); 			// end_x
-	ST7735S_send_data((x + w) & 0xFF);
+	ST7735S_start_command();
+	SPI_transfer(0x2A); 		// Column Address Set
+	ST7735S_start_data();
+	SPI_transfer(0x00); 		// start_x
+	SPI_transfer(x & 0xFF);
+	SPI_transfer(0x00); 		// end_x
+	SPI_transfer((x + w) & 0xFF);
 
-	ST7735S_send_command(0x2B); 		// Row Address Set
-	ST7735S_send_data(0x00); 			// start_y
-	ST7735S_send_data(y & 0xFF);
-	ST7735S_send_data(0x00); 			// end_y
-	ST7735S_send_data((y + h) & 0xFF);
+	ST7735S_start_command();
+	SPI_transfer(0x2B); 		// Row Address Set
+	ST7735S_start_data();
+	SPI_transfer(0x00); 		// start_y
+	SPI_transfer(y & 0xFF);
+	SPI_transfer(0x00); 		// end_y
+	SPI_transfer((y + h) & 0xFF);
 
-	ST7735S_send_command(0x2C); // Memory Write
+	ST7735S_start_command();
+	SPI_transfer(0x2C); 		// Memory Write
 
 	// pixel color data
-	for (int i = 0; i < (w + 1) * (h + 1); i++) {
-		ST7735S_send_data(c >> 8);
-		ST7735S_send_data(c & 0xFF);
+	ST7735S_start_data();
+
+	for (int i = 0; i < (w + 1) * (h + 1) / 2; i++) {
+		SPI_transfer(r << 4 | g);
+		SPI_transfer(b << 4 | r);
+		SPI_transfer(g << 4 | b);
 	}
 }
 
@@ -157,7 +170,7 @@ inline uint16_t get_y1024() {
 }
 
 void sleep() {
-	_delay_ms(100);
+	_delay_ms(50);
 }
 
 
